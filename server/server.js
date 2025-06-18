@@ -2,8 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
-import connectDB from './db.js';
+import path from 'path';
+import express from 'express';
+import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
@@ -18,11 +19,16 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // if file uploads used
+app.use('/uploads', express.static(path.join(path.resolve(), '/uploads')));
+
 
 // ✅ API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tickets', ticketRoutes);
+
+const __dirname = path.resolve();
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // ✅ Connect to MongoDB and start server
 connectDB().then(() => {

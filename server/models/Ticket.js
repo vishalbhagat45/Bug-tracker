@@ -16,6 +16,11 @@ const ticketSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }
     }
   ],
+  screenshot: {
+  type: String,
+  default: '',
+},
+
   attachment: String // Optional - for screenshot URL
 }, { timestamps: true });
 
