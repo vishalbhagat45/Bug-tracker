@@ -10,9 +10,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await axios.post('/auth/login', form);
-    login({ ...res.data.user, token: res.data.token });
-    navigate('/');
+    try {
+      const res = await axios.post('/auth/login', form);
+      login({ ...res.data.user, token: res.data.token });
+      navigate('/');
+    } catch (err) {
+      alert('Login failed: ' + err.response?.data?.message || 'Unknown error');
+    }
   };
 
   return (
@@ -20,7 +24,7 @@ const Login = () => {
       <h2 className="text-xl font-bold mb-4">Login</h2>
       <input className="w-full mb-3 p-2 border" placeholder="Email" onChange={e => setForm({ ...form, email: e.target.value })} />
       <input type="password" className="w-full mb-3 p-2 border" placeholder="Password" onChange={e => setForm({ ...form, password: e.target.value })} />
-      <button className="bg-blue-600 text-white px-4 py-2">Login</button>
+      <button className="bg-blue-600 text-white px-4 py-2 w-full">Login</button>
     </form>
   );
 };

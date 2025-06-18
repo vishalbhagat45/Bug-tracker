@@ -1,82 +1,85 @@
-import { useState, useEffect } from 'react';
-import axios from '../../api/axios';
+import { useEffect, useState } from 'react';
+import axios from '../api/axios';
 
-const TicketForm = ({ projectId, ticket = null, onClose, onSuccess }) => {
-  const [title, setTitle] = useState(ticket?.title || '');
-  const [description, setDescription] = useState(ticket?.description || '');
-  const [priority, setPriority] = useState(ticket?.priority || 'Low');
-  const [assignee, setAssignee] = useState(ticket?.assignee?._id || '');
-  const [users, setUsers] = useState([]);
+const TicketForm = ({ projectId, ticket, onSave }) => {
+  const [form, setForm] = useState({
+    title: ticket?.title || '',
+    description: ticket?.description || '',
+    status: ticket?.status || 'todo',
+    priority: ticket?.priority || 'medium',
+    assignedTo: ticket?.assignedTo?._id || '',
+  });
+
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    axios.get(`/projects/${projectId}/members`).then(res => {
-      setUsers(res.data);
-    });
+    const fetchMembers = async () => {
+      const res = await axios.get(`/projects/${projectId}`);
+      setMembers(res.data.project.members);
+    };
+    fetchMembers();
   }, [projectId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { title, description, priority, assignee };
-
     if (ticket) {
-      await axios.put(`/tickets/${ticket._id}`, payload);
+      await axios.put(`/tickets/${ticket._id}`, form);
     } else {
-      await axios.post(`/projects/${projectId}/tickets`, payload);
+      await axios.post(`/tickets`, { ...form, projectId });
     }
-
-    onSuccess();
-    onClose();
+    onSave(); // callback to refresh parent component
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow w-full max-w-md">
-      <h2 className="text-xl font-bold mb-4">{ticket ? 'Edit Ticket' : 'Create Ticket'}</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Title"
-          className="w-full border p-2 rounded"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Description"
-          className="w-full border p-2 rounded"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <select
-          className="w-full border p-2 rounded"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
-        <select
-          className="w-full border p-2 rounded"
-          value={assignee}
-          onChange={(e) => setAssignee(e.target.value)}
-        >
-          <option value="">Unassigned</option>
-          {users.map((user) => (
-            <option key={user._id} value={user._id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
-        <div className="flex gap-2 justify-end">
-          <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-            {ticket ? 'Update' : 'Create'}
-          </button>
-        </div>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="bg-white shadow p-4 rounded">
+      <input
+        className="w-full p-2 border mb-3"
+        placeholder="Title"
+        value={form.title}
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        required
+      />
+      <textarea
+        className="w-full p-2 border mb-3"
+        placeholder="Description"
+        value={form.description}
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+        rows={3}
+      />
+      <select
+        className="w-full p-2 border mb-3"
+        value={form.status}
+        onChange={(e) => setForm({ ...form, status: e.target.value })}
+      >
+        <option value="todo">To Do</option>
+        <option value="inprogress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+      <select
+        className="w-full p-2 border mb-3"
+        value={form.priority}
+        onChange={(e) => setForm({ ...form, priority: e.target.value })}
+      >
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <select
+        className="w-full p-2 border mb-3"
+        value={form.assignedTo}
+        onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+      >
+        <option value="">Unassigned</option>
+        {members.map((member) => (
+          <option key={member._id} value={member._id}>
+            {member.name}
+          </option>
+        ))}
+      </select>
+      <button className="bg-blue-600 text-white px-4 py-2 rounded">
+        {ticket ? 'Update' : 'Create'} Ticket
+      </button>
+    </form>
   );
 };
 

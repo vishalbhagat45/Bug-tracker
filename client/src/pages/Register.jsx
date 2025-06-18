@@ -8,8 +8,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post('/auth/register', form);
-    navigate('/login');
+    try {
+      await axios.post('/auth/register', form);
+      navigate('/login');
+    } catch (err) {
+      alert('Registration failed: ' + err.response?.data?.message || 'Unknown error');
+    }
   };
 
   return (
@@ -22,7 +26,7 @@ const Register = () => {
         <option value="developer">Developer</option>
         <option value="manager">Manager</option>
       </select>
-      <button className="bg-blue-600 text-white px-4 py-2">Register</button>
+      <button className="bg-blue-600 text-white px-4 py-2 w-full">Register</button>
     </form>
   );
 };

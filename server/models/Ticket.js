@@ -1,12 +1,14 @@
-const mongoose = require('mongoose');
+// Ticket.js
+import mongoose from 'mongoose';
 
 const ticketSchema = new mongoose.Schema({
-  title: String,
+  title: { type: String, required: true },
   description: String,
+  status: { type: String, enum: ['todo', 'in progress', 'done'], default: 'todo' },
+  priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
-  status: { type: String, enum: ['To Do', 'In Progress', 'Done'], default: 'To Do' },
-  priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-  assignee: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   comments: [
     {
       text: String,
@@ -14,7 +16,8 @@ const ticketSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }
     }
   ],
-  attachments: [String] // file paths
+  attachment: String // Optional - for screenshot URL
 }, { timestamps: true });
 
-module.exports = mongoose.model('Ticket', ticketSchema);
+const Ticket = mongoose.model('Ticket', ticketSchema);
+export default Ticket;

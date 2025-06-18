@@ -13,4 +13,3 @@ root.render(
     </AuthProvider>
   </BrowserRouter>
 );
-

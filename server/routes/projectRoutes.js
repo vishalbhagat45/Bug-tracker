@@ -1,17 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { createProject, getProjects, getProjectById } from '../controllers/projectController.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const auth = require('../middleware/authMiddleware');
-const Project = require('../models/Project');
 
-router.post('/', auth, async (req, res) => {
-  const project = new Project(req.body);
-  await project.save();
-  res.json(project);
-});
+router.post('/', auth, createProject);
+router.get('/', auth, getProjects);
+router.get('/:id', auth, getProjectById);
 
-router.get('/', auth, async (req, res) => {
-  const projects = await Project.find().populate('members', 'name email');
-  res.json(projects);
-});
-
-module.exports = router;
+export default router;
