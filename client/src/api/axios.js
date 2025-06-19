@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: '/api', // Proxy is used in package.json
+  baseURL: '/api', // ✅ Don't use full URL here when proxy is set
 });
 
 instance.interceptors.request.use(config => {

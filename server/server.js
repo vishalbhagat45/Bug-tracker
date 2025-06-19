@@ -15,62 +15,68 @@ import ticketRoutes from './routes/ticketRoutes.js';
 
 dotenv.config();
 
-// Initialize Express and HTTP server
-const app = express();
-const server = http.createServer(app);
-
-// Set up __dirname in ES Modules
+// Setup __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Setup Socket.io
+// Initialize Express app and HTTP server
+const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io server
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // Change this to match your frontend port
+    origin: ['http://localhost:3000', 'http://localhost:5173'], // Allow both ports
     credentials: true,
   },
 });
 
+// Attach Socket.io instance to app so controllers can use it
+app.set('io', io);
+
+// Socket.io connection handler
 io.on('connection', (socket) => {
-  console.log('✅ Socket connected:', socket.id);
+  console.log(`✅ Socket connected: ${socket.id}`);
 
   socket.on('disconnect', () => {
-    console.log('❌ Socket disconnected:', socket.id);
+    console.log(`❌ Socket disconnected: ${socket.id}`);
   });
 });
 
-// Make io accessible in controllers via app.get('io')
-app.set('io', io);
-
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tickets', ticketRoutes);
 
-// Fallback route (optional)
-app.get('/', (req, res) => {
-  res.send('Bug Tracker API is running...');
+// Catch-all for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
-// Connect to MongoDB and start server
+// Default route
+app.get('/', (req, res) => {
+  res.send('✅ Bug Tracker API is running...');
+});
+
+// Connect to MongoDB and start the server
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
     server.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`);
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('❌ Failed to connect to MongoDB:', error);
+    console.error('❌ MongoDB connection failed:', error.message);
     process.exit(1);
   });

@@ -11,45 +11,72 @@ const TicketDetail = () => {
   const { user } = useAuth();
 
   const [ticket, setTicket] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', priority: '', status: '', assignedTo: '' });
+  const [form, setForm] = useState({ title: '', description: '', priority: 'low', status: 'todo', assignedTo: '' });
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
 
-  // ---------------- Fetch Ticket ----------------
+  // Fetch Ticket
   const fetchTicket = async () => {
     try {
       const res = await axios.get(`/tickets/${id}`);
-      setTicket(res.data);
+      const data = res.data;
+      setTicket(data);
       setForm({
-        title: res.data.title,
-        description: res.data.description,
-        priority: res.data.priority,
-        status: res.data.status,
-        assignedTo: res.data.assignedTo?._id || '',
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        status: data.status,
+        assignedTo: data.assignedTo?._id || '',
       });
     } catch (err) {
-      toast.error('Error fetching ticket');
+      toast.error('Failed to fetch ticket');
     } finally {
       setLoading(false);
     }
   };
 
-  // ---------------- Fetch Comments ----------------
+  // Fetch Comments
   const fetchComments = async () => {
     try {
       const res = await axios.get(`/tickets/${id}/comments`);
       setComments(res.data);
     } catch (err) {
-      console.error('Failed to fetch comments', err);
+      toast.error('Failed to load comments');
     }
   };
 
-  // ---------------- Upload File ----------------
+  // Update Ticket
+  const handleUpdate = async () => {
+    try {
+      await axios.put(`/tickets/${id}`, form);
+      toast.success('Ticket updated');
+      setEditMode(false);
+      fetchTicket();
+    } catch (err) {
+      toast.error('Update failed');
+    }
+  };
+
+  // Delete Ticket
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this ticket?')) return;
+    try {
+      await axios.delete(`/tickets/${id}`);
+      toast.success('Ticket deleted');
+      navigate('/dashboard');
+    } catch (err) {
+      toast.error('Delete failed');
+    }
+  };
+
+  // Upload Screenshot
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
     const formData = new FormData();
     formData.append('screenshot', file);
 
@@ -64,33 +91,10 @@ const TicketDetail = () => {
     }
   };
 
-  // ---------------- Update Ticket ----------------
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`/tickets/${id}`, form);
-      toast.success('Ticket updated');
-      setEditMode(false);
-      fetchTicket();
-    } catch (err) {
-      toast.error('Update failed');
-    }
-  };
-
-  // ---------------- Delete Ticket ----------------
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this ticket?')) return;
-    try {
-      await axios.delete(`/tickets/${id}`);
-      toast.success('Ticket deleted');
-      navigate('/dashboard');
-    } catch (err) {
-      toast.error('Delete failed');
-    }
-  };
-
-  // ---------------- Add Comment ----------------
+  // Add Comment
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
+
     try {
       await axios.post(`/tickets/${id}/comments`, {
         text: commentText,
@@ -103,11 +107,24 @@ const TicketDetail = () => {
     }
   };
 
-  // ---------------- Socket.io Listeners ----------------
+  // Permissions
+  const canEdit = user && (
+    user._id === ticket?.createdBy?._id ||
+    user.role === 'manager' ||
+    user.role === 'admin' ||
+    user._id === ticket?.assignedTo?._id
+  );
+  const canDelete = user && (user.role === 'admin' || user.role === 'manager');
+  const canUpload = canEdit;
+
+  // Sockets
   useEffect(() => {
+    fetchTicket();
+    fetchComments();
+
     socket.on('newComment', (data) => {
       if (data.ticketId === id) {
-        setComments(prev => [...prev, data.comment]);
+        setComments((prev) => [...prev, data.comment]);
       }
     });
 
@@ -130,37 +147,21 @@ const TicketDetail = () => {
     };
   }, [id]);
 
-  useEffect(() => {
-    fetchTicket();
-    fetchComments();
-  }, []);
-
-  // ---------------- Permissions ----------------
-  const canEdit = user && (
-    user._id === ticket?.createdBy?._id ||
-    user.role === 'manager' ||
-    user.role === 'admin' ||
-    ticket?.assignedTo?._id === user._id
-  );
-
-  const canDelete = user && (user.role === 'admin' || user.role === 'manager');
-  const canUpload = canEdit;
-
   if (loading) return <p className="text-center mt-10">Loading ticket...</p>;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Ticket Detail</h2>
+      <h2 className="text-2xl font-bold mb-4">🎟️ Ticket Detail</h2>
 
-      {/* ---------------- Ticket Info / Edit ---------------- */}
+      {/* Ticket Edit/View */}
       {editMode ? (
         <div className="space-y-3">
-          <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full p-2 border" />
-          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full p-2 border" />
-          <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} className="w-full p-2 border">
+          <input className="w-full p-2 border" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+          <textarea className="w-full p-2 border" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+          <select className="w-full p-2 border" value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
             <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
           </select>
-          <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full p-2 border">
+          <select className="w-full p-2 border" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
             <option value="todo">To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option>
           </select>
           <button onClick={handleUpdate} className="bg-green-600 text-white px-4 py-2 rounded">Save</button>
@@ -184,7 +185,7 @@ const TicketDetail = () => {
         </div>
       )}
 
-      {/* ---------------- Screenshot Upload ---------------- */}
+      {/* Screenshot Upload */}
       {canUpload && (
         <div className="mt-6">
           <h4 className="font-semibold mb-2">Upload Screenshot:</h4>
@@ -195,9 +196,9 @@ const TicketDetail = () => {
         </div>
       )}
 
-      {/* ---------------- Comments Section ---------------- */}
+      {/* Comments */}
       <div className="mt-10">
-        <h3 className="text-xl font-semibold mb-4">Comments</h3>
+        <h3 className="text-xl font-semibold mb-4">💬 Comments</h3>
 
         {comments.length === 0 ? (
           <p className="text-gray-500">No comments yet.</p>
@@ -213,22 +214,21 @@ const TicketDetail = () => {
             ))}
           </ul>
         )}
-      </div>
 
-      {/* ---------------- Add Comment ---------------- */}
-      {user && (
-        <div className="mt-6">
-          <textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Write your comment..."
-          />
-          <button onClick={handleAddComment} className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded">
-            Add Comment
-          </button>
-        </div>
-      )}
+        {user && (
+          <div className="mt-4">
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              className="w-full p-2 border rounded"
+              placeholder="Write your comment..."
+            />
+            <button onClick={handleAddComment} className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded">
+              Add Comment
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
