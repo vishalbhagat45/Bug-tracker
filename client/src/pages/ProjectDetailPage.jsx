@@ -4,7 +4,7 @@ import TicketForm from '../components/TicketForm';
 import TicketList from '../components/TicketList';
 import AddProjectUserForm from '../components/AddprojectUser';
 import { AuthContext } from '../context/AuthContext';  
-import KanbanBoard from '../components/kanbanboard';
+import KanbanBoard from '../components/KanbanBoard';
 
 const ProjectDetailPage = () => {
   const navigate = useNavigate();

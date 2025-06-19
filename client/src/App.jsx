@@ -1,6 +1,6 @@
 // App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // ✅ Add this
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -12,29 +12,23 @@ import KanbanBoard from './components/KanbanBoard';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Don't forget CSS!
-
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
-    <AuthProvider> {/* ✅ Wrap the entire app */}
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-
-          {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="/ticket/:id" element={<TicketDetail />} />
-            <Route path="/tickets" element={<AllTickets />} />
-            <Route path="/project/:id/kanban" element={<KanbanBoard />} />
-          </Route>
-        </Routes>
-      </Router>
+    <AuthProvider>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/project/:id" element={<ProjectDetail />} />
+          <Route path="/ticket/:id" element={<TicketDetail />} />
+          <Route path="/tickets" element={<AllTickets />} />
+          <Route path="/project/:id/kanban" element={<KanbanBoard />} />
+        </Route>
+      </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </AuthProvider>
   );
