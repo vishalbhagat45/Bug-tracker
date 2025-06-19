@@ -1,31 +1,10 @@
-// /server/models/projectModel.js
+import mongoose from "mongoose";
 
-import mongoose from 'mongoose';
+const projectSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String },
+  teamMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+}, { timestamps: true });
 
-const projectSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Project name is required'],
-    },
-    description: {
-      type: String,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      }
-    ],
-  },
-  { timestamps: true }
-);
-
-const Project = mongoose.model('Project', projectSchema);
-
-export default Project;
+export default mongoose.model("Project", projectSchema);
