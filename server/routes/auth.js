@@ -24,6 +24,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login route
+// server/routes/auth.js
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -34,13 +35,14 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid password' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
     res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Server error' });
   }
+});
+
  
 
-});
+
 
 export default router;

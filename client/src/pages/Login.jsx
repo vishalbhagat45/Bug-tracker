@@ -14,16 +14,20 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleSubmit = async e => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
   setError('');
   try {
-    await login(formData);  // now it works correctly
-    navigate('/');
+    console.log('Submitting login:', formData);
+    await login(formData); // Calls context
+    console.log('Login successful');
+    navigate('/dashboard'); // Use proper route
   } catch (err) {
-    setError('Invalid credentials. Please try again.');
+    console.error('Login failed:', err.message);
+    setError('Invalid email or password');
   }
 };
+
 
 
   return (

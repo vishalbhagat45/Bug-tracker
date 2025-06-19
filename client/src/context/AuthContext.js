@@ -7,32 +7,28 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [user, setUser] = useState(null);
 
-  // Keep token synced across tabs
+  const API_URL = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
-    const syncToken = () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken !== token) {
-        setToken(storedToken);
-      }
-    };
-    window.addEventListener('storage', syncToken);
-    return () => window.removeEventListener('storage', syncToken);
+    const storedToken = localStorage.getItem('token');
+    if (storedToken !== token) {
+      setToken(storedToken);
+    }
   }, [token]);
 
-  // ✅ LOGIN: Call backend, store token
   const login = async ({ email, password }) => {
-    const res = await axios.post('http://localhost:5000/api/auth/login', {
-      email,
-      password,
-    });
-
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    setToken(token);
-    setUser(user);
+    try {
+      const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+      const { token, user } = res.data;
+      localStorage.setItem('token', token);
+      setToken(token);
+      setUser(user);
+    } catch (err) {
+      console.error('Login failed:', err);
+      throw new Error('Login failed');
+    }
   };
 
-  // ✅ LOGOUT: Clear token
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
