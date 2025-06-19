@@ -14,16 +14,17 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      await login(formData);
-      navigate('/');
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
-    }
-  };
+ const handleSubmit = async e => {
+  e.preventDefault();
+  setError('');
+  try {
+    await login(formData);  // now it works correctly
+    navigate('/');
+  } catch (err) {
+    setError('Invalid credentials. Please try again.');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-blue-200 to-blue-500 px-4">
