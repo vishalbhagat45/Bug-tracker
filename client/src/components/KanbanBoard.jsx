@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from '../api/axios';
 import TicketCard from './TicketCard';
 import { useAuth } from '../context/AuthContext';
+import socket from '../socket';
 
 const statuses = ['To Do', 'In Progress', 'Done'];
 
@@ -10,14 +11,31 @@ const KanbanBoard = ({ projectId }) => {
   const { user } = useAuth();
   const [tickets, setTickets] = useState([]);
 
+  // Fetch tickets on mount or when projectId changes
   useEffect(() => {
     fetchTickets();
   }, [projectId]);
 
   const fetchTickets = async () => {
-    const res = await axios.get(`/tickets/project/${projectId}`);
-    setTickets(res.data);
+    try {
+      const res = await axios.get(`/tickets/project/${projectId}`);
+      setTickets(res.data);
+    } catch (err) {
+      console.error('Error fetching tickets:', err);
+    }
   };
+
+  // Socket event listener
+  useEffect(() => {
+    const handleUpdate = (updatedTicket) => {
+      setTickets((prev) =>
+        prev.map((t) => (t._id === updatedTicket._id ? updatedTicket : t))
+      );
+    };
+
+    socket.on('ticketUpdated', handleUpdate);
+    return () => socket.off('ticketUpdated', handleUpdate);
+  }, []);
 
   const canDrag = (ticket) => {
     if (!user || !ticket) return false;
@@ -33,21 +51,27 @@ const KanbanBoard = ({ projectId }) => {
     const { destination, source, draggableId } = result;
     if (!destination || destination.droppableId === source.droppableId) return;
 
-    const ticket = tickets.find(t => t._id === draggableId);
-    if (!canDrag(ticket)) return; // Block unauthorized drag
+    const ticket = tickets.find((t) => t._id === draggableId);
+    if (!canDrag(ticket)) return;
 
     const updatedTickets = [...tickets];
-    const updatedTicket = updatedTickets.find(t => t._id === draggableId);
-    updatedTicket.status = destination.droppableId;
+    const updatedTicket = updatedTickets.find((t) => t._id === draggableId);
+    if (!updatedTicket) return;
 
+    updatedTicket.status = destination.droppableId;
     setTickets(updatedTickets);
-    await axios.put(`/tickets/${draggableId}`, { status: destination.droppableId });
+
+    try {
+      await axios.put(`/tickets/${draggableId}`, { status: destination.droppableId });
+    } catch (err) {
+      console.error('Failed to update ticket status:', err);
+    }
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        {statuses.map(status => (
+        {statuses.map((status) => (
           <Droppable key={status} droppableId={status}>
             {(provided) => (
               <div
@@ -57,11 +81,11 @@ const KanbanBoard = ({ projectId }) => {
               >
                 <h3 className="text-lg font-bold mb-2">{status}</h3>
                 {tickets
-                  .filter(ticket => ticket.status === status)
+                  .filter((ticket) => ticket.status === status)
                   .map((ticket, index) => {
                     const isDraggable = canDrag(ticket);
                     return isDraggable ? (
-                      <Draggable draggableId={ticket._id} index={index} key={ticket._id}>
+                      <Draggable key={ticket._id} draggableId={ticket._id} index={index}>
                         {(provided) => (
                           <div
                             ref={provided.innerRef}
@@ -74,7 +98,10 @@ const KanbanBoard = ({ projectId }) => {
                         )}
                       </Draggable>
                     ) : (
-                      <div key={ticket._id} className="mb-2 opacity-70 cursor-not-allowed">
+                      <div
+                        key={ticket._id}
+                        className="mb-2 opacity-70 cursor-not-allowed"
+                      >
                         <TicketCard ticket={ticket} />
                       </div>
                     );
