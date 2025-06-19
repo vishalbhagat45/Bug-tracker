@@ -1,48 +1,86 @@
 import { useState } from 'react';
-import axios from '../api/axios';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-toastify';
 
-const Login = () => {
+function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post('/auth/login', form);
-      login({ ...res.data.user, token: res.data.token });
-      toast.success('Logged in successfully!');
-      navigate('/');
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, form);
+      localStorage.setItem('token', res.data.token);
+      
+      navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      alert(err.response?.data?.message || 'Login error');
     }
   };
 
+  const goToRegister = () => {
+    navigate('/register');
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md"
-    >
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <input
-        className="w-full mb-3 p-2 border"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-      />
-      <input
-        type="password"
-        className="w-full mb-3 p-2 border"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-      />
-      <button className="bg-blue-600 text-white px-4 py-2 w-full">Login</button>
-    </form>
+    <div className='min-h-screen w-full flex'>
+     <div className="w-full lg:w-1/2 flex items-center justify-center bg-transparent">
+      <form 
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm space-y-6"
+      >
+        <h2 className="text-3xl font-bold text-center text-blue-700">Welcome Back</h2>
+        <p className="text-sm text-center ">Login to your account</p>
+
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition"
+        >
+          Login
+        </button>
+
+        <button
+          type="button"
+          onClick={goToRegister}
+          className="w-full text-blue-600 hover:underline text-center"
+        >
+          Don't have an account? Register
+        </button>
+      </form>
+    </div>
+     <div className="hidden lg:flex w-1/2 items-center justify-center bg-blue-600 text-white">
+    <div className="text-center p-10">
+      <h2 className="text-3xl font-bold mb-4">Welcome to ProjectHub</h2>
+      <p className="text-lg">Collaborate. Track. Succeed.</p>
+    </div>
+  </div>
+    
+</div>
+
   );
-};
+}
 
 export default Login;

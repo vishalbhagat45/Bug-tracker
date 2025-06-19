@@ -1,34 +1,22 @@
-// AuthContext.js
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useState } from 'react';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
-  const navigate = useNavigate();
+  const [token, setToken] = useState(()=>localStorage.getItem('token'));
 
-  const login = (userData) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+  const login = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/login');
+    localStorage.removeItem("token");
+    setToken(null);
   };
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ token,login,logout }}>
       {children}
     </AuthContext.Provider>
-  );
+);
 };
-
-export const useAuth = () => useContext(AuthContext);

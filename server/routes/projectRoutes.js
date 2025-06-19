@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/', protect, authorizeRoles('admin', 'manager'), createProject);
 
 // GET /api/projects – get all projects (authenticated users)
-router.get('/', protect, getProjects);
+router.get('/', getProjects);
 
 // GET /api/projects/:id – get a project by ID (authenticated users)
 router.get('/:id', protect, getProjectById);
