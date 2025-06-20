@@ -6,8 +6,8 @@ A full-featured **Bug & Issue Tracking System** built with the **MERN stack** (M
 
 ## 🔗 Live Demo
 
-- 🌐 Frontend: [https://bug-tracker-yourname.vercel.app](bug-tracker-boap-25o7kai78-vishals-projects-dd38c9a3.vercel.app)
-- ⚙️ Backend: [https://bug-tracker-api.onrender.com](https://bug-tracker-5yd2.onrender.com))
+- 🌐 Frontend: [bug-tracker-boap-25o7kai78-vishals-projects-dd38c9a3.vercel.app](bug-tracker-boap-25o7kai78-vishals-projects-dd38c9a3.vercel.app)
+- ⚙️ Backend: [https://bug-tracker-5yd2.onrender.com](https://bug-tracker-5yd2.onrender.com)
 
 ---
 
