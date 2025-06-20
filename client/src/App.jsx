@@ -6,7 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
-import ProjectDetail from './pages/ProjectDetail';
+import ProjectDetail from './pages/ProjectDetailPage';
 import TicketDetail from './pages/TicketDetail';
 import AllTickets from './pages/AllTickets';
 import KanbanBoard from './components/KanbanBoard';
@@ -14,6 +14,7 @@ import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 
 const App = () => {
   return (
@@ -24,7 +25,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/project/:id" element={<ProjectDetail />} />
+          <Route path="/project/:id" element={<ProjectDetailPage />} />
           <Route path="/ticket/:id" element={<TicketDetail />} />
           <Route path="/tickets" element={<AllTickets />} />
           <Route path="/project/:id/kanban" element={<KanbanBoard />} />

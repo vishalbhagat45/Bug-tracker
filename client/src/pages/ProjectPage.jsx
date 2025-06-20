@@ -51,12 +51,12 @@ const ProjectsPage = () => {
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <button
         onClick={() => navigate("/dashboard")}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
       >
         ← Back to Dashboard
       </button>
 
-      <h1 className="text-3xl font-bold text-blue-700">Projects</h1>
+      <h1 className="text-3xl font-bold text-cyan-700">Projects</h1>
 
       {error && <p className="text-red-500">{error}</p>}
 
@@ -84,7 +84,7 @@ const ProjectsPage = () => {
           />
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+            className="bg-cyan-600 text-white px-6 py-2 rounded hover:bg-cyan-700 transition"
           >
             Add Project
           </button>
