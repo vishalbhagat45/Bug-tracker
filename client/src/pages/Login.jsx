@@ -31,7 +31,8 @@ const Login = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-blue-200 to-blue-500 px-4">
+    
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-cyan-100 to-cyan-300 px-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8 space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-800">Log in</h2>
@@ -57,7 +58,7 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
 
@@ -73,13 +74,13 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+            className="w-full bg-cyan-600 text-white py-2 rounded-md hover:bg-cyan-700 transition duration-200"
           >
             Log In
           </button>
@@ -87,7 +88,7 @@ const Login = () => {
 
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 hover:underline font-medium">
+          <Link to="/register" className="text-cyan-600 hover:underline font-medium">
             Register
           </Link>
         </p>
