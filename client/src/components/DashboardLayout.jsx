@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Folder, Settings, LogOut } from 'lucide-react';
 import LogoutButton from './Logout';
+import { Settings as SettingsIcon } from 'lucide-react'; // or your icon library
 
 const DashboardLayout = ({ children }) => {
   return (
@@ -12,7 +13,7 @@ const DashboardLayout = ({ children }) => {
 
         <nav className="flex flex-col space-y-2">
           <Link
-            to="/"
+            to="/dashboard"
             className="flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-cyan-600 transition"
           >
             <Home className="w-5 h-5" />
@@ -31,7 +32,7 @@ const DashboardLayout = ({ children }) => {
             to="/settings"
             className="flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-cyan-600 transition"
           >
-            <Settings className="w-5 h-5" />
+            <SettingsIcon className="w-5 h-5" />
             Settings
           </Link>
 

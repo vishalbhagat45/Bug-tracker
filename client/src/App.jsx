@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
 import ProjectDetail from './pages/ProjectDetail';
 import TicketDetail from './pages/TicketDetail';
 import AllTickets from './pages/AllTickets';
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/ticket/:id" element={<TicketDetail />} />
           <Route path="/tickets" element={<AllTickets />} />
           <Route path="/project/:id/kanban" element={<KanbanBoard />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
