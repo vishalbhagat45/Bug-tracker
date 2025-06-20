@@ -57,3 +57,11 @@ A full-featured **Bug & Issue Tracking System** built with the **MERN stack** (M
 ```bash
 cd server
 npm install
+npm run dev
+
+### ⚙️ Frontend Setup
+
+```bash
+cd client
+npm install
+npm start
